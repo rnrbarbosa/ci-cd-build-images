@@ -1,15 +1,4 @@
 ---
-jobs:  
-- name: build-docker-image
-  public: true
-  serial: true
-  plan:
-  - get: git-build-docker-image
-    trigger: true
-  - put: docker-image
-    params:
-      build: git-build-docker-image/ci
-
 resources:  
 - name: git-build-docker-image
   type: git
@@ -17,10 +6,22 @@ resources:
     uri: https://github.com/rnrbarbosa/ci-cd-build-images.git
     branch: master
 
-- name: docker-image
+- name: nuxeo-image
   type: docker-image
   source:
     email: {{docker-hub-email}}
     username: {{docker-hub-username}}
     password: {{docker-hub-password}}
-    repository: {{docker-create-concourse-go-image}}
+    repository: rnrbarbosa
+
+jobs:  
+- name: build-docker-image
+  public: true
+  serial: true
+  plan:
+  - get: git-build-docker-image
+    trigger: true
+  - put: nuxeo-image
+    params:
+      build: ci-nuxeo
+
